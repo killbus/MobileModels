@@ -222,7 +222,7 @@
 
 `M2007J3SI`: 小米 10T Pro 印度版
 
-**[`J17`] 小米 10T Lite (`gauguin`):**
+**[`J17`] 红米 Note 9 Pro / 小米 10T Lite (`gauguin`):**
 
 `M2007J17G`: 小米 10T Lite 国际版
 
