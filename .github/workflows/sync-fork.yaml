@@ -1,6 +1,9 @@
 name: Fork sync with upstream
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     - cron: '*/1 * * * *' # every 30 minutes
   workflow_dispatch: # on button click
@@ -13,29 +16,33 @@ jobs:
     steps:
     # Step 1: run a standard checkout action, provided by github
     - name: Checkout master
-      uses: actions/checkout@v2
+      uses: actions/checkout@v2.3.4
       with:
         ref: master
         fetch-depth: 0
         # submodules: 'recursive'     ### may be needed in your situation
 
     # Step 2: run this sync action - specify the upstream repo, upstream branch to sync with, and target sync branch
-    - name: Pull (Fast-Forward) upstream changes
+    - name: Pull (Rebase) upstream changes
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v2.3
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.1
       with:
-        upstream_repository: KHwang9883/MobileModels
-        upstream_branch: master
-        target_branch: master
-        git_pull_args: --ff-only                    # optional arg use, defaults to simple 'pull'
-        git_pull_rebase_config: true
-        git_push_args: --force
-        github_token: ${{ secrets.GITHUB_TOKEN }}   # optional, for accessing repos that require authentication
+        target_sync_branch: master
+        upstream_sync_repo: KHwang9883/MobileModels
+        upstream_sync_branch: master
+        upstream_pull_args: --rebase                    # optional arg use, defaults to simple 'pull'
+        git_config_pull_rebase: true
+        target_push_args: --force
+        target_repo_token: ${{ secrets.GITHUB_TOKEN }}   # optional, for accessing repos that require authentication
 
-    # Step 3: Display a message if 'sync' step had new commits (simple test)
-    - name: Check for new commits
-      if: steps.sync.outputs.has_new_commits
-      run: echo "There were new commits."
+    # Step 3: Display a sample message based on the sync output var 'has_new_commits'
+    - name: New commits found
+      if: steps.sync.outputs.has_new_commits == 'true'
+      run: echo "New commits were found to sync."
+    
+    - name: No new commits
+      if: steps.sync.outputs.has_new_commits == 'false'
+      run: echo "There were no new commits."
 
     # Step 4: Print a helpful timestamp for your records (not required, just nice)
     - name: Timestamp
